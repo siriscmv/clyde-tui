@@ -115,7 +115,8 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		return m, nil
 
 	case DiscordMessage:
-		md, _ := glamour.RenderWithEnvironmentConfig(msg.Content)
+		parsed := strings.ReplaceAll(msg.Content, fmt.Sprintf("<@!%s>", CurrentUserID), "`@You`")
+		md, _ := glamour.RenderWithEnvironmentConfig(parsed)
 		m.messages = append(m.messages, ClydeStyle.Render("Clyde: ")+strings.Trim(md, "\n")+"\n")
 		m.viewport.SetContent(strings.Join(m.messages, "\n"))
 		m.viewport.GotoBottom()

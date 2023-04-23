@@ -11,11 +11,13 @@ import (
 
 type DiscordMessage *gateway.MessageCreateEvent
 
-var clydeChannel discord.ChannelID
-
 const clydeID = 1081004946872352958
 
-var s *session.Session
+var (
+	s             *session.Session
+	clydeChannel  discord.ChannelID
+	CurrentUserID string
+)
 
 func RunDiscordSession(token string) {
 	s = session.New(token)
@@ -37,6 +39,7 @@ func RunDiscordSession(token string) {
 	}
 
 	p.Send(logMsg{Msg: "Logged in as " + u.Username, Type: Info})
+	CurrentUserID = u.ID.String()
 	select {}
 }
 
