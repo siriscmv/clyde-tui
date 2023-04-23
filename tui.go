@@ -155,3 +155,10 @@ func RunTUI() {
 		panic(err)
 	}
 }
+
+//TODO: [Ideas after making sure app is functional]:
+//TODO: When a prompt is entered, send it to chat and replace the prompt with a spinner,
+//TODO: and grey out the input bar somehow, Basically it must block until clyde response is received
+//TODO: (could use a waiting bool field) While the waiting field is true,
+//TODO: user input must be ignored, other than ctrl+c ofc.
+//TODO: When the response is received, send it in chat, then replace input bar to original state
