@@ -65,7 +65,7 @@ func initialModel() model {
 	ta.ShowLineNumbers = false
 	ta.KeyMap.InsertNewline.SetEnabled(false)
 
-	vp := viewport.New(30, 3) //TODO: Allow mouse scroll to scroll up and down
+	vp := viewport.New(30, 3)
 	vp.SetContent("Type a prompt and press Enter to ask Clyde AI.")
 	vp.MouseWheelEnabled = true
 
@@ -116,7 +116,7 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 	case DiscordMessage:
 		md, _ := glamour.RenderWithEnvironmentConfig(msg.Content)
-		m.messages = append(m.messages, ClydeStyle.Render("Clyde: ")+strings.Trim(md, "\n") + "\n")
+		m.messages = append(m.messages, ClydeStyle.Render("Clyde: ")+strings.Trim(md, "\n")+"\n")
 		m.viewport.SetContent(strings.Join(m.messages, "\n"))
 		m.viewport.GotoBottom()
 
