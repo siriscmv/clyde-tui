@@ -7,3 +7,16 @@
 - This is useful because:
   - ChatGPT website has heavy bot checks, to the point where it is annoying to use even as an actual user
   - The official ChatGPT API is free only for the first 3 months
+
+## Usage
+
+- Create a new Discord user account and get its token
+- Create a private Discord server, enable Clyde, create a thread for Clyde and copy its ID
+- Create an .env file:
+
+```env
+TOKEN="user_token_here"
+CLYDE_CHANNEL_ID="channel_id_here"
+```
+
+- Run using `go run .`
