@@ -1,6 +1,7 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
 	"strings"
 
@@ -55,14 +56,12 @@ func initialModel() model {
 	ta.Focus()
 
 	ta.Prompt = UserStyle.Render("❯ ")
-	ta.CharLimit = 280
+	ta.CharLimit = 2000
 
 	ta.SetWidth(30)
 	ta.SetHeight(1) //TODO: Change height when pasting big chunks of text, also allow multiline input
 
-	// Remove cursor line styling
 	ta.FocusedStyle.CursorLine = lipgloss.NewStyle()
-
 	ta.ShowLineNumbers = false
 	ta.KeyMap.InsertNewline.SetEnabled(false)
 
@@ -87,6 +86,17 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		vpCmd tea.Cmd
 	)
 
+	bytes, _ := json.Marshal(msg)
+	msgString := string(bytes)
+	if msgString == "{}" {
+		return m, nil
+	}
+
+	LogToFile(msg)
+
+	m.textarea, tiCmd = m.textarea.Update(msg)
+	m.viewport, vpCmd = m.viewport.Update(msg)
+
 	switch msg := msg.(type) {
 	case tea.WindowSizeMsg:
 		m.viewport.Height = msg.Height - 2
@@ -94,9 +104,6 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		m.textarea.SetWidth(msg.Width)
 
 	case tea.KeyMsg:
-		m.textarea, tiCmd = m.textarea.Update(msg)
-		m.viewport, vpCmd = m.viewport.Update(msg)
-
 		switch msg.Type {
 		case tea.KeyCtrlC, tea.KeyEsc:
 			return m, tea.Quit
@@ -112,6 +119,7 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 	case errMsg:
 		m.err = msg
+		return m, nil
 
 	case DiscordMessage:
 		m.messages = append(m.messages, ClydeStyle.Render("Clyde: ")+msg.Content) //TODO: Use glamour to render codeblocks, markdown etc
