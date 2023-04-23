@@ -10,8 +10,7 @@ import (
 	"github.com/charmbracelet/lipgloss"
 )
 
-var m = initialModel()
-var p = tea.NewProgram(m)
+var p *tea.Program
 
 type (
 	errMsg error
@@ -67,7 +66,7 @@ func initialModel() model {
 	ta.ShowLineNumbers = false
 	ta.KeyMap.InsertNewline.SetEnabled(false)
 
-	vp := viewport.New(30, 3)
+	vp := viewport.New(30, 3) //TODO: Allow mouse scroll to scroll up and down
 	vp.SetContent("Type a prompt and press Enter to ask Clyde AI.")
 
 	return model{
@@ -88,9 +87,6 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		vpCmd tea.Cmd
 	)
 
-	m.textarea, tiCmd = m.textarea.Update(msg)
-	m.viewport, vpCmd = m.viewport.Update(msg) //FIX: Type assert here and dont run these 2 lines for DiscordMessage & LogMsg
-
 	switch msg := msg.(type) {
 	case tea.WindowSizeMsg:
 		m.viewport.Height = msg.Height - 2
@@ -98,12 +94,14 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		m.textarea.SetWidth(msg.Width)
 
 	case tea.KeyMsg:
+		m.textarea, tiCmd = m.textarea.Update(msg)
+		m.viewport, vpCmd = m.viewport.Update(msg)
+
 		switch msg.Type {
 		case tea.KeyCtrlC, tea.KeyEsc:
 			return m, tea.Quit
 		case tea.KeyEnter:
 			prompt := m.textarea.Value()
-
 			go AskClyde(prompt)
 
 			m.messages = append(m.messages, UserStyle.Render("You: ")+prompt)
@@ -114,14 +112,11 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 	case errMsg:
 		m.err = msg
-		return m, nil
 
 	case DiscordMessage:
 		m.messages = append(m.messages, ClydeStyle.Render("Clyde: ")+msg.Content) //TODO: Use glamour to render codeblocks, markdown etc
 		m.viewport.SetContent(strings.Join(m.messages, "\n"))
 		m.viewport.GotoBottom()
-
-		return m, nil
 
 	case logMsg:
 		switch msg.Type {
@@ -135,8 +130,6 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 		m.viewport.SetContent(strings.Join(m.messages, "\n"))
 		m.viewport.GotoBottom()
-
-		return m, nil
 	}
 
 	return m, tea.Batch(tiCmd, vpCmd)
@@ -151,6 +144,9 @@ func (m model) View() string {
 }
 
 func RunTUI() {
+	var m = initialModel()
+	p = tea.NewProgram(m)
+
 	if err := p.Start(); err != nil {
 		panic(err)
 	}
