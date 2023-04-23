@@ -56,7 +56,7 @@ func initialModel() model {
 	ta.Prompt = "┃ "
 	ta.CharLimit = 280
 
-	ta.SetWidth(80)
+	ta.SetWidth(30)
 	ta.SetHeight(2)
 
 	// Remove cursor line styling
@@ -64,7 +64,7 @@ func initialModel() model {
 
 	ta.ShowLineNumbers = false
 
-	vp := viewport.New(80, 10)
+	vp := viewport.New(30, 3)
 	vp.SetContent("Type a prompt and press Enter to ask Clyde AI.")
 
 	ta.KeyMap.InsertNewline.SetEnabled(false)
@@ -89,9 +89,14 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	)
 
 	m.textarea, tiCmd = m.textarea.Update(msg)
-	m.viewport, vpCmd = m.viewport.Update(msg) //TOOD: Type assert here and dont run these 2 lines for DiscordMessage & LogMsg
+	m.viewport, vpCmd = m.viewport.Update(msg) //FIX: Type assert here and dont run these 2 lines for DiscordMessage & LogMsg
 
 	switch msg := msg.(type) {
+	case tea.WindowSizeMsg:
+		m.viewport.Height = msg.Height - 2 * 2
+		m.viewport.Width = msg.Width
+		m.textarea.SetWidth(msg.Width) //FIX: Rerender/Resize properly
+		
 	case tea.KeyMsg:
 		switch msg.Type {
 		case tea.KeyCtrlC, tea.KeyEsc:
