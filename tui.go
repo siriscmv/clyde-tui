@@ -32,20 +32,22 @@ type Log struct {
 }
 
 type model struct {
-	viewport    viewport.Model
-	messages    []string
-	textarea    textarea.Model
-	senderStyle lipgloss.Style
-	err         error
+	viewport viewport.Model
+	textarea textarea.Model
+	messages []string
+	err      error
 }
 
 var (
-	InfoLogStyle = lipgloss.NewStyle().
-			Foreground(lipgloss.Color("#66F359"))
-	WarningLogStyle = lipgloss.NewStyle().
-			Foreground(lipgloss.Color("#F3F359"))
-	ErrorLogStyle = lipgloss.NewStyle().
-			Foreground(lipgloss.Color("#F35959"))
+	BoldStyle    = lipgloss.NewStyle().Bold(true)
+	InfoLogStyle = BoldStyle.Copy().
+			Foreground(lipgloss.Color("#a6da95"))
+	WarningLogStyle = BoldStyle.Copy().
+			Foreground(lipgloss.Color("#eed49f"))
+	ErrorLogStyle = BoldStyle.Copy().
+			Foreground(lipgloss.Color("#ed8796"))
+	UserStyle  = BoldStyle.Copy().Foreground(lipgloss.Color("#c6a0f6"))
+	ClydeStyle = BoldStyle.Copy().Foreground(lipgloss.Color("#8aadf4"))
 )
 
 func initialModel() model {
@@ -53,28 +55,26 @@ func initialModel() model {
 	ta.Placeholder = "Ask Clyde anything here"
 	ta.Focus()
 
-	ta.Prompt = "┃ "
+	ta.Prompt = UserStyle.Render("❯ ")
 	ta.CharLimit = 280
 
 	ta.SetWidth(30)
-	ta.SetHeight(2)
+	ta.SetHeight(1) //TODO: Change height when pasting big chunks of text, also allow multiline input
 
 	// Remove cursor line styling
 	ta.FocusedStyle.CursorLine = lipgloss.NewStyle()
 
 	ta.ShowLineNumbers = false
+	ta.KeyMap.InsertNewline.SetEnabled(false)
 
 	vp := viewport.New(30, 3)
 	vp.SetContent("Type a prompt and press Enter to ask Clyde AI.")
 
-	ta.KeyMap.InsertNewline.SetEnabled(false)
-
 	return model{
-		textarea:    ta,
-		messages:    []string{},
-		viewport:    vp,
-		senderStyle: lipgloss.NewStyle().Foreground(lipgloss.Color("5")),
-		err:         nil,
+		textarea: ta,
+		messages: []string{},
+		viewport: vp,
+		err:      nil,
 	}
 }
 
@@ -93,9 +93,9 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 	switch msg := msg.(type) {
 	case tea.WindowSizeMsg:
-		m.viewport.Height = msg.Height - 2*2
+		m.viewport.Height = msg.Height - 2
 		m.viewport.Width = msg.Width
-		m.textarea.SetWidth(msg.Width) //FIX: Rerender/Resize properly
+		m.textarea.SetWidth(msg.Width)
 
 	case tea.KeyMsg:
 		switch msg.Type {
@@ -106,7 +106,7 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 			go AskClyde(prompt)
 
-			m.messages = append(m.messages, m.senderStyle.Render("You: ")+prompt)
+			m.messages = append(m.messages, UserStyle.Render("You: ")+prompt)
 			m.viewport.SetContent(strings.Join(m.messages, "\n"))
 			m.textarea.Reset()
 			m.viewport.GotoBottom()
@@ -117,7 +117,7 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		return m, nil
 
 	case DiscordMessage:
-		m.messages = append(m.messages, m.senderStyle.Render("AI: ")+msg.Content)
+		m.messages = append(m.messages, ClydeStyle.Render("Clyde: ")+msg.Content) //TODO: Use glamour to render codeblocks, markdown etc
 		m.viewport.SetContent(strings.Join(m.messages, "\n"))
 		m.viewport.GotoBottom()
 
@@ -126,11 +126,11 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	case logMsg:
 		switch msg.Type {
 		case Info:
-			m.messages = append(m.messages, InfoLogStyle.Render("SYSTEM: "+msg.Msg))
+			m.messages = append(m.messages, InfoLogStyle.Render("System: ")+msg.Msg)
 		case Warning:
-			m.messages = append(m.messages, WarningLogStyle.Render("SYSTEM: "+msg.Msg))
+			m.messages = append(m.messages, WarningLogStyle.Render("System: ")+msg.Msg)
 		case Error:
-			m.messages = append(m.messages, ErrorLogStyle.Render("SYSTEM: "+msg.Msg))
+			m.messages = append(m.messages, ErrorLogStyle.Render("System: ")+msg.Msg)
 		}
 
 		m.viewport.SetContent(strings.Join(m.messages, "\n"))
@@ -147,7 +147,7 @@ func (m model) View() string {
 		"%s\n\n%s",
 		m.viewport.View(),
 		m.textarea.View(),
-	) + "\n\n"
+	)
 }
 
 func RunTUI() {
