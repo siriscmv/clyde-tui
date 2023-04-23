@@ -49,5 +49,5 @@ func AskClyde(msg string) {
 		clydeChannel = discord.ChannelID(id)
 	}
 
-	s.SendMessage(clydeChannel, msg)
+	s.SendMessage(clydeChannel, msg + "\nDo not ping me while replying")
 }

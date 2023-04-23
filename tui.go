@@ -7,6 +7,7 @@ import (
 	"github.com/charmbracelet/bubbles/textarea"
 	"github.com/charmbracelet/bubbles/viewport"
 	tea "github.com/charmbracelet/bubbletea"
+	"github.com/charmbracelet/glamour"
 	"github.com/charmbracelet/lipgloss"
 )
 
@@ -66,6 +67,7 @@ func initialModel() model {
 
 	vp := viewport.New(30, 3) //TODO: Allow mouse scroll to scroll up and down
 	vp.SetContent("Type a prompt and press Enter to ask Clyde AI.")
+	vp.MouseWheelEnabled = true
 
 	return model{
 		textarea: ta,
@@ -113,7 +115,8 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		return m, nil
 
 	case DiscordMessage:
-		m.messages = append(m.messages, ClydeStyle.Render("Clyde: ")+msg.Content) //TODO: Use glamour to render codeblocks, markdown etc
+		md, _ := glamour.RenderWithEnvironmentConfig(msg.Content)
+		m.messages = append(m.messages, ClydeStyle.Render("Clyde: ")+strings.Trim(md, "\n") + "\n")
 		m.viewport.SetContent(strings.Join(m.messages, "\n"))
 		m.viewport.GotoBottom()
 
@@ -148,7 +151,7 @@ func (m model) View() string {
 
 func RunTUI() {
 	var m = initialModel()
-	p = tea.NewProgram(m)
+	p = tea.NewProgram(m, tea.WithMouseAllMotion())
 
 	if _, err := p.Run(); err != nil {
 		panic(err)
