@@ -5,7 +5,6 @@ import (
 	"log"
 	"os"
 
-	"github.com/diamondburned/arikawa/v3/api"
 	"github.com/diamondburned/arikawa/v3/discord"
 	"github.com/diamondburned/arikawa/v3/gateway"
 	"github.com/diamondburned/arikawa/v3/session"
@@ -17,14 +16,16 @@ var clydeChannel discord.ChannelID
 
 const clydeID = 1081004946872352958
 
+var s *session.Session
+
 func RunDiscordSession(token string) {
-	s := session.New(token)
+	s = session.New(token)
 	s.AddHandler(func(c *gateway.MessageCreateEvent) {
 		if c.Author.ID != clydeID || c.ChannelID != clydeChannel {
 			return
 		}
 
-		p.Send(DiscordMessage(c))
+		p.Send(c)
 	})
 
 	s.AddIntents(gateway.IntentGuildMessages)
@@ -48,9 +49,7 @@ func RunDiscordSession(token string) {
 	select {}
 }
 
-var HttpClient = api.NewClient(os.Getenv("token"))
-
-func SendDiscordMessage(msg string) {
+func AskClyde(msg string) {
 	if clydeChannel == 0 {
 		id, err := discord.ParseSnowflake(os.Getenv("CLYDE_CHANNEL_ID"))
 		if err != nil {
@@ -59,5 +58,5 @@ func SendDiscordMessage(msg string) {
 		clydeChannel = discord.ChannelID(id)
 	}
 
-	HttpClient.SendMessage(clydeChannel, msg)
+	s.SendMessage(clydeChannel, msg)
 }

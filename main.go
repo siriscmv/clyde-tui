@@ -20,7 +20,5 @@ func main() {
 	}
 
 	go RunDiscordSession(token)
-	if err := p.Start(); err != nil {
-		log.Fatal(err)
-	}
+	RunTUI()
 }

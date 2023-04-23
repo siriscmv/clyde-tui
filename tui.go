@@ -50,7 +50,7 @@ var (
 
 func initialModel() model {
 	ta := textarea.New()
-	ta.Placeholder = "Send a message..."
+	ta.Placeholder = "Ask Clyde anything here"
 	ta.Focus()
 
 	ta.Prompt = "┃ "
@@ -89,7 +89,7 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	)
 
 	m.textarea, tiCmd = m.textarea.Update(msg)
-	m.viewport, vpCmd = m.viewport.Update(msg)
+	m.viewport, vpCmd = m.viewport.Update(msg) //TOOD: Type assert here and dont run these 2 lines for DiscordMessage & LogMsg
 
 	switch msg := msg.(type) {
 	case tea.KeyMsg:
@@ -99,7 +99,7 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		case tea.KeyEnter:
 			prompt := m.textarea.Value()
 
-			go SendDiscordMessage(prompt)
+			go AskClyde(prompt)
 
 			m.messages = append(m.messages, m.senderStyle.Render("You: ")+prompt)
 			m.viewport.SetContent(strings.Join(m.messages, "\n"))
@@ -143,4 +143,10 @@ func (m model) View() string {
 		m.viewport.View(),
 		m.textarea.View(),
 	) + "\n\n"
+}
+
+func RunTUI() {
+	if err := p.Start(); err != nil {
+		panic(err)
+	}
 }
