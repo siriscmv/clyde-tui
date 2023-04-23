@@ -93,10 +93,10 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 	switch msg := msg.(type) {
 	case tea.WindowSizeMsg:
-		m.viewport.Height = msg.Height - 2 * 2
+		m.viewport.Height = msg.Height - 2*2
 		m.viewport.Width = msg.Width
 		m.textarea.SetWidth(msg.Width) //FIX: Rerender/Resize properly
-		
+
 	case tea.KeyMsg:
 		switch msg.Type {
 		case tea.KeyCtrlC, tea.KeyEsc:
