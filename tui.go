@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/charmbracelet/bubbles/key"
 	"github.com/charmbracelet/bubbles/spinner"
 	"github.com/charmbracelet/bubbles/textarea"
 	"github.com/charmbracelet/bubbles/viewport"
@@ -27,6 +28,8 @@ const (
 	Error
 )
 
+const spacebar = " "
+
 type Log struct {
 	Msg  string
 	Type LogType
@@ -39,6 +42,15 @@ type model struct {
 	waiting  bool
 	messages []string
 	err      error
+}
+
+type KeyMap struct {
+	PageDown     key.Binding
+	PageUp       key.Binding
+	HalfPageUp   key.Binding
+	HalfPageDown key.Binding
+	Down         key.Binding
+	Up           key.Binding
 }
 
 var (
@@ -72,6 +84,17 @@ func initialModel() model {
 	vp := viewport.New(30, 3)
 	vp.SetContent("Type a prompt and press Enter to ask Clyde AI.")
 	vp.MouseWheelEnabled = true
+
+	vp.KeyMap = viewport.KeyMap(KeyMap{
+		Up: key.NewBinding(
+			key.WithKeys("up"),
+			key.WithHelp("↑", "up"),
+		),
+		Down: key.NewBinding(
+			key.WithKeys("down"),
+			key.WithHelp("↓", "down"),
+		),
+	})
 
 	sp := spinner.New()
 	sp.Spinner = spinner.Dot
