@@ -2,7 +2,6 @@ package main
 
 import (
 	"context"
-	"log"
 	"os"
 
 	"github.com/diamondburned/arikawa/v3/discord"
@@ -24,11 +23,8 @@ func RunDiscordSession(token string) {
 		if c.Author.ID != clydeID || c.ChannelID != clydeChannel {
 			return
 		}
-
-		p.Send(c)
+		p.Send(DiscordMessage(c))
 	})
-
-	s.AddIntents(gateway.IntentGuildMessages)
 
 	if err := s.Open(context.Background()); err != nil {
 		p.Send(logMsg{Msg: "Unable to establish discord connection", Type: Error})
@@ -41,11 +37,6 @@ func RunDiscordSession(token string) {
 	}
 
 	p.Send(logMsg{Msg: "Logged in as " + u.Username, Type: Info})
-
-	if _, err := p.Run(); err != nil {
-		log.Fatal(err)
-	}
-
 	select {}
 }
 

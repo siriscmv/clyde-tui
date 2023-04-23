@@ -1,7 +1,6 @@
 package main
 
 import (
-	"encoding/json"
 	"fmt"
 	"strings"
 
@@ -86,14 +85,6 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		vpCmd tea.Cmd
 	)
 
-	bytes, _ := json.Marshal(msg)
-	msgString := string(bytes)
-	if msgString == "{}" {
-		return m, nil
-	}
-
-	LogToFile(msg)
-
 	m.textarea, tiCmd = m.textarea.Update(msg)
 	m.viewport, vpCmd = m.viewport.Update(msg)
 
@@ -126,6 +117,8 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		m.viewport.SetContent(strings.Join(m.messages, "\n"))
 		m.viewport.GotoBottom()
 
+		return m, nil
+
 	case logMsg:
 		switch msg.Type {
 		case Info:
@@ -138,6 +131,8 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 		m.viewport.SetContent(strings.Join(m.messages, "\n"))
 		m.viewport.GotoBottom()
+
+		return m, nil
 	}
 
 	return m, tea.Batch(tiCmd, vpCmd)
@@ -155,7 +150,7 @@ func RunTUI() {
 	var m = initialModel()
 	p = tea.NewProgram(m)
 
-	if err := p.Start(); err != nil {
+	if _, err := p.Run(); err != nil {
 		panic(err)
 	}
 }
