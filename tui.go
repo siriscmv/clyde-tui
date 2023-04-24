@@ -76,7 +76,7 @@ func initialModel() model {
 	ta.CharLimit = 2000
 
 	ta.SetWidth(30)
-	ta.SetHeight(1) //TODO: Change height when pasting big chunks of text, also allow multiline input
+	ta.SetHeight(1)
 
 	ta.FocusedStyle.CursorLine = ta.FocusedStyle.CursorLine.Copy().UnsetBackground()
 	ta.ShowLineNumbers = false
