@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"os"
 	"strings"
 
 	"github.com/charmbracelet/bubbles/key"
@@ -154,7 +155,13 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 	case DiscordMessage:
 		parsed := strings.ReplaceAll(msg.Content, fmt.Sprintf("<@!%s>", CurrentUserID), "`@You`")
-		md, _ := glamour.RenderWithEnvironmentConfig(parsed)
+		var md string
+
+		if os.Getenv("GLAMOUR_STYLE") != "" {
+			md, _ = glamour.RenderWithEnvironmentConfig(parsed)
+		} else {
+			md, _ = glamour.Render(parsed, "dark")
+		}
 
 		m.waiting = false
 		m.messages = append(m.messages, ClydeStyle.Render("Clyde: ")+strings.Trim(md, "\n")+"\n")

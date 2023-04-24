@@ -21,6 +21,7 @@
 ```env
 TOKEN="user_token_here"
 CLYDE_CHANNEL_ID="channel_id_here"
+GLAMOUR_STYLE="/path/to/glamour/style" # optional
 ```
 
 - Run using `go run .`
