@@ -29,7 +29,10 @@ const (
 	Error
 )
 
-const spacebar = " "
+const (
+	spacebar = " "
+	help    = "ctrl+c • Quit | ctrl+s • Toggle mouse | ctrl+p • Multiline prompt | @cb • Paste clipboard"
+)
 
 type Log struct {
 	Msg  string
@@ -63,14 +66,16 @@ var (
 			Foreground(lipgloss.Color("#eed49f"))
 	ErrorLogStyle = BoldStyle.Copy().
 			Foreground(lipgloss.Color("#ed8796"))
-	UserStyle  = BoldStyle.Copy().Foreground(lipgloss.Color("#c6a0f6"))
-	ClydeStyle = BoldStyle.Copy().Foreground(lipgloss.Color("#8aadf4"))
-	FadedStyle = lipgloss.NewStyle().Foreground(lipgloss.Color("#6e738d"))
+	UserStyle      = BoldStyle.Copy().Foreground(lipgloss.Color("#c6a0f6"))
+	ClydeStyle     = BoldStyle.Copy().Foreground(lipgloss.Color("#8aadf4"))
+	FadedStyle     = lipgloss.NewStyle().Foreground(lipgloss.Color("#6e738d"))
+	HelpStyle = FadedStyle.Copy().Italic(true).Padding(0, 1).Margin(0, 1)
+	ContainerStyle = lipgloss.NewStyle().Border(lipgloss.RoundedBorder()).BorderForeground(lipgloss.Color("#c6a0f6")).Padding(1).Margin(1)
 )
 
 func initialModel() model {
 	ta := textarea.New()
-	ta.Placeholder = "Talk with Clyde here" + lipgloss.NewStyle().Faint(true).Italic(true).Render(" | ctrl+s • Toggle mouse")
+	ta.Placeholder = "Talk with Clyde here"
 	ta.Focus()
 
 	ta.Prompt = UserStyle.Render("❯ ")
@@ -130,9 +135,9 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 	switch msg := msg.(type) {
 	case tea.WindowSizeMsg:
-		m.viewport.Height = msg.Height - 2
-		m.viewport.Width = msg.Width
-		m.textarea.SetWidth(msg.Width)
+		m.viewport.Height = msg.Height - 10
+		m.viewport.Width = msg.Width - 6
+		m.textarea.SetWidth(msg.Width - 6)
 
 	case tea.KeyMsg:
 		switch msg.Type {
@@ -201,20 +206,22 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 }
 
 func (m model) View() string {
+	var bottomView string
 	if m.waiting {
-		return fmt.Sprintf(
-			"%s\n\n%s",
-			m.viewport.View(),
-			m.spinner.View()+FadedStyle.Render(" Waiting for Clyde..."),
-		)
+		bottomView = m.spinner.View() + FadedStyle.Render(" Waiting for Clyde...")
 	} else {
-		return fmt.Sprintf(
-			"%s\n\n%s",
-			m.viewport.View(),
-			m.textarea.View(),
-		)
+		bottomView = m.textarea.View()
 	}
 
+	view := ContainerStyle.Render(
+		fmt.Sprintf(
+			"%s\n\n%s",
+			m.viewport.View(),
+			lipgloss.NewStyle().Width(m.viewport.Width).Render(bottomView),
+		),
+	)
+
+	return view + "\n" + HelpStyle.Render(help)
 }
 
 func RunTUI() {
