@@ -68,7 +68,7 @@ var (
 			Foreground(lipgloss.Color("#ed8796"))
 	UserStyle      = BoldStyle.Copy().Foreground(lipgloss.Color("#c6a0f6"))
 	ClydeStyle     = BoldStyle.Copy().Foreground(lipgloss.Color("#8aadf4"))
-	FadedStyle     = lipgloss.NewStyle().Foreground(lipgloss.Color("#6e738d"))
+	FadedStyle     = lipgloss.NewStyle().Foreground(lipgloss.Color("#999999"))
 	HelpStyle      = FadedStyle.Copy().Italic(true).Padding(0, 1).Margin(0, 1)
 	ContainerStyle = lipgloss.NewStyle().Border(lipgloss.RoundedBorder()).BorderForeground(lipgloss.Color("#c6a0f6")).Padding(1).Margin(1)
 )
