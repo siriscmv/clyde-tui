@@ -31,7 +31,7 @@ const (
 
 const (
 	spacebar = " "
-	help    = "ctrl+c • Quit | ctrl+s • Toggle mouse | ctrl+p • Multiline prompt | @cb • Paste clipboard"
+	help     = "ctrl+c • Quit | ctrl+s • Toggle mouse | ctrl+p • Multiline prompt | @cb • Paste clipboard"
 )
 
 type Log struct {
@@ -69,7 +69,7 @@ var (
 	UserStyle      = BoldStyle.Copy().Foreground(lipgloss.Color("#c6a0f6"))
 	ClydeStyle     = BoldStyle.Copy().Foreground(lipgloss.Color("#8aadf4"))
 	FadedStyle     = lipgloss.NewStyle().Foreground(lipgloss.Color("#6e738d"))
-	HelpStyle = FadedStyle.Copy().Italic(true).Padding(0, 1).Margin(0, 1)
+	HelpStyle      = FadedStyle.Copy().Italic(true).Padding(0, 1).Margin(0, 1)
 	ContainerStyle = lipgloss.NewStyle().Border(lipgloss.RoundedBorder()).BorderForeground(lipgloss.Color("#c6a0f6")).Padding(1).Margin(1)
 )
 
