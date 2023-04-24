@@ -72,7 +72,7 @@ func initialModel() model {
 	ta.Placeholder = "Ask Clyde anything here"
 	ta.Focus()
 
-	ta.Prompt = UserStyle.Render("❯ ") //FIX: Prompt + Spinner loses style once user starts typing
+	ta.Prompt = UserStyle.Render("❯ ")
 	ta.CharLimit = 2000
 
 	ta.SetWidth(30)
