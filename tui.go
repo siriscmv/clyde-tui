@@ -41,6 +41,7 @@ type model struct {
 	textarea textarea.Model
 	spinner  spinner.Model
 	waiting  bool
+	mouse    bool
 	messages []string
 	err      error
 }
@@ -69,7 +70,7 @@ var (
 
 func initialModel() model {
 	ta := textarea.New()
-	ta.Placeholder = "Ask Clyde anything here"
+	ta.Placeholder = "Talk with Clyde here" + lipgloss.NewStyle().Faint(true).Italic(true).Render(" | ctrl+s • Toggle mouse")
 	ta.Focus()
 
 	ta.Prompt = UserStyle.Render("❯ ")
@@ -108,6 +109,7 @@ func initialModel() model {
 		messages: []string{},
 		err:      nil,
 		waiting:  false,
+		mouse:    true,
 	}
 }
 
@@ -134,6 +136,15 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 	case tea.KeyMsg:
 		switch msg.Type {
+		case tea.KeyCtrlS:
+			if m.mouse {
+				m.mouse = false
+				return m, tea.Sequence(tea.DisableMouse, getLogCmd("Disabled mouse scroll/clicks", Info))
+			} else {
+				m.mouse = true
+				return m, tea.Sequence(tea.EnableMouseCellMotion, getLogCmd("Enabled mouse scroll/clicks", Info))
+			}
+
 		case tea.KeyCtrlC, tea.KeyEsc:
 			return m, tea.Quit
 		case tea.KeyEnter:
@@ -208,9 +219,15 @@ func (m model) View() string {
 
 func RunTUI() {
 	var m = initialModel()
-	p = tea.NewProgram(m, tea.WithMouseAllMotion())
+	p = tea.NewProgram(m, tea.WithMouseCellMotion())
 
 	if _, err := p.Run(); err != nil {
 		panic(err)
+	}
+}
+
+func getLogCmd(msg string, msgType LogType) tea.Cmd {
+	return func() tea.Msg {
+		return logMsg{Msg: msg, Type: msgType}
 	}
 }
