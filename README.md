@@ -20,3 +20,7 @@ CLYDE_CHANNEL_ID="channel_id_here"
 ```
 
 - Run using `go run .`
+
+## Features
+
+- Paste content from clipboard using `@cb` in your prompt

@@ -3,10 +3,12 @@ package main
 import (
 	"context"
 	"os"
+	"strings"
 
 	"github.com/diamondburned/arikawa/v3/discord"
 	"github.com/diamondburned/arikawa/v3/gateway"
 	"github.com/diamondburned/arikawa/v3/session"
+	"golang.design/x/clipboard"
 )
 
 type DiscordMessage *gateway.MessageCreateEvent
@@ -50,6 +52,16 @@ func AskClyde(msg string) {
 			p.Send(logMsg{Msg: "Unable to parse channel id", Type: Error})
 		}
 		clydeChannel = discord.ChannelID(id)
+	}
+
+	if strings.Contains(msg, "@cb") {
+		err := clipboard.Init()
+		if err != nil {
+			p.Send(Log{Msg: "Unable to initialize clipboard", Type: Error})
+		} else {
+			msg = strings.ReplaceAll(msg, "@cb", string(clipboard.Read(clipboard.FmtText)))
+		}
+
 	}
 
 	s.SendMessage(clydeChannel, msg)
