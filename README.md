@@ -8,6 +8,10 @@
   - ChatGPT website has heavy bot checks, to the point where it is annoying to use even as an actual user
   - The official ChatGPT API is free only for the first 3 months
 
+## Demo
+
+[![asciicast](https://asciinema.org/a/HeEq8E9ku7CwS7SKdRZ6v3HJF.svg)](https://asciinema.org/a/HeEq8E9ku7CwS7SKdRZ6v3HJF)
+
 ## Usage
 
 - Create a new Discord user account and get its token
