@@ -10,7 +10,7 @@
 
 ## Demo
 
-[![asciicast](https://asciinema.org/a/HeEq8E9ku7CwS7SKdRZ6v3HJF.svg)](https://asciinema.org/a/HeEq8E9ku7CwS7SKdRZ6v3HJF)
+[![asciicast](https://asciinema.org/a/32qmAtmjgKSNVOIPTOckoi12p.svg)](https://asciinema.org/a/32qmAtmjgKSNVOIPTOckoi12p)
 
 ## Usage
 
