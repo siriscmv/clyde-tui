@@ -19,7 +19,7 @@
 - Create an .env file:
 
 ```env
-TOKEN="user_token_here"
+CLYDE_DISCORD_USER_TOKEN="user_token_here"
 CLYDE_CHANNEL_ID="channel_id_here"
 GLAMOUR_STYLE="/path/to/glamour/style" # optional
 ```

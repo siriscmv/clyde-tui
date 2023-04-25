@@ -9,10 +9,10 @@ import (
 
 func main() {
 	godotenv.Load(".env")
-	token := os.Getenv("TOKEN")
+	token := os.Getenv("CLYDE_DISCORD_USER_TOKEN")
 
 	if token == "" {
-		log.Fatalln("No $TOKEN given.")
+		log.Fatalln("No $CLYDE_DISCORD_USER_TOKEN given.")
 		os.Exit(1)
 	} else if os.Getenv("CLYDE_CHANNEL_ID") == "" {
 		log.Fatalln("No $CLYDE_CHANNEL_ID given.")
