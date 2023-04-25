@@ -19,6 +19,7 @@ func main() {
 		os.Exit(1)
 	}
 
+	go InitClipboard()
 	go RunDiscordSession(token)
 	RunTUI()
 }

@@ -31,7 +31,7 @@ const (
 
 const (
 	spacebar = " "
-	help     = "ctrl+c • Quit | ctrl+s • Toggle mouse | ctrl+p • Multiline prompt | @cb • Paste clipboard"
+	help     = "Ctrl+x • Copy last msg | ctrl+s • Toggle mouse | ctrl+p • Multiline prompt | @cb • Paste clipboard"
 )
 
 type Log struct {
@@ -43,6 +43,7 @@ type model struct {
 	viewport viewport.Model
 	textarea textarea.Model
 	spinner  spinner.Model
+	lastMsg  string
 	waiting  bool
 	mouse    bool
 	messages []string
@@ -66,8 +67,7 @@ var (
 			Foreground(lipgloss.Color("#eed49f"))
 	ErrorLogStyle = BoldStyle.Copy().
 			Foreground(lipgloss.Color("#ed8796"))
-	UserStyle      = BoldStyle.Copy().Foreground(lipgloss.Color("#c6a0f6"))
-	ClydeStyle     = BoldStyle.Copy().Foreground(lipgloss.Color("#8aadf4"))
+	UserStyle      = lipgloss.NewStyle().Foreground(lipgloss.Color("#c6a0f6"))
 	FadedStyle     = lipgloss.NewStyle().Foreground(lipgloss.Color("#999999"))
 	HelpStyle      = FadedStyle.Copy().Italic(true).Padding(0, 1).Margin(0, 1)
 	ContainerStyle = lipgloss.NewStyle().Border(lipgloss.RoundedBorder()).BorderForeground(lipgloss.Color("#c6a0f6")).Padding(1).Margin(1)
@@ -112,6 +112,7 @@ func initialModel() model {
 		viewport: vp,
 		spinner:  sp,
 		messages: []string{},
+		lastMsg:  "",
 		err:      nil,
 		waiting:  false,
 		mouse:    true,
@@ -149,7 +150,9 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 				m.mouse = true
 				return m, tea.Sequence(tea.EnableMouseCellMotion, getLogCmd("Enabled mouse scroll/clicks", Info))
 			}
-
+		case tea.KeyCtrlX:
+			WriteClipboard(m.lastMsg)
+			return m, getLogCmd(fmt.Sprintf("Copied %d characters!", len(m.lastMsg)), Info)
 		case tea.KeyCtrlC, tea.KeyEsc:
 			return m, tea.Quit
 		case tea.KeyEnter:
@@ -157,7 +160,7 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			go AskClyde(prompt)
 
 			m.waiting = true
-			m.messages = append(m.messages, UserStyle.Render("You: ")+prompt)
+			m.messages = append(m.messages, UserStyle.Render(prompt))
 			m.viewport.SetContent(strings.Join(m.messages, "\n"))
 			m.textarea.Reset()
 			m.viewport.GotoBottom()
@@ -173,6 +176,8 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		parsed := strings.ReplaceAll(msg.Content, fmt.Sprintf("<@!%s>", CurrentUserID), "`@You`")
 		var md string
 
+		m.lastMsg = parsed
+
 		if os.Getenv("GLAMOUR_STYLE") != "" {
 			md, _ = glamour.RenderWithEnvironmentConfig(parsed)
 		} else {
@@ -180,20 +185,19 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		}
 
 		m.waiting = false
-		m.messages = append(m.messages, ClydeStyle.Render("Clyde: ")+strings.Trim(md, "\n")+"\n")
+		m.messages = append(m.messages, strings.Trim(md, "\n")+"\n")
 		m.viewport.SetContent(strings.Join(m.messages, "\n"))
-		m.viewport.GotoBottom()
 
 		return m, nil
 
 	case logMsg:
 		switch msg.Type {
 		case Info:
-			m.messages = append(m.messages, InfoLogStyle.Render("System: ")+msg.Msg)
+			m.messages = append(m.messages, InfoLogStyle.Render(msg.Msg))
 		case Warning:
-			m.messages = append(m.messages, WarningLogStyle.Render("System: ")+msg.Msg)
+			m.messages = append(m.messages, WarningLogStyle.Render(msg.Msg))
 		case Error:
-			m.messages = append(m.messages, ErrorLogStyle.Render("System: ")+msg.Msg)
+			m.messages = append(m.messages, ErrorLogStyle.Render(msg.Msg))
 		}
 
 		m.viewport.SetContent(strings.Join(m.messages, "\n"))

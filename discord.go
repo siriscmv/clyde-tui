@@ -8,7 +8,6 @@ import (
 	"github.com/diamondburned/arikawa/v3/discord"
 	"github.com/diamondburned/arikawa/v3/gateway"
 	"github.com/diamondburned/arikawa/v3/session"
-	"golang.design/x/clipboard"
 )
 
 type DiscordMessage *gateway.MessageCreateEvent
@@ -55,13 +54,7 @@ func AskClyde(msg string) {
 	}
 
 	if strings.Contains(msg, "@cb") {
-		err := clipboard.Init()
-		if err != nil {
-			p.Send(Log{Msg: "Unable to initialize clipboard", Type: Error})
-		} else {
-			msg = strings.ReplaceAll(msg, "@cb", string(clipboard.Read(clipboard.FmtText)))
-		}
-
+		msg = strings.ReplaceAll(msg, "@cb", ReadClipboard())
 	}
 
 	s.SendMessage(clydeChannel, msg)
