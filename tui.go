@@ -14,7 +14,7 @@ import (
 	"github.com/charmbracelet/lipgloss"
 )
 
-var p *tea.Program
+var tui *tea.Program
 
 type (
 	errMsg error
@@ -230,9 +230,9 @@ func (m model) View() string {
 
 func RunTUI() {
 	var m = initialModel()
-	p = tea.NewProgram(m, tea.WithMouseCellMotion())
+	tui = tea.NewProgram(m, tea.WithMouseCellMotion())
 
-	if _, err := p.Run(); err != nil {
+	if _, err := tui.Run(); err != nil {
 		panic(err)
 	}
 }

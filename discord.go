@@ -26,20 +26,20 @@ func RunDiscordSession(token string) {
 		if c.Author.ID != clydeID || c.ChannelID != clydeChannel {
 			return
 		}
-		p.Send(DiscordMessage(c))
+		tui.Send(DiscordMessage(c))
 	})
 
 	if err := s.Open(context.Background()); err != nil {
-		p.Send(logMsg{Msg: "Unable to establish discord connection", Type: Error})
+		tui.Send(logMsg{Msg: "Unable to establish discord connection", Type: Error})
 	}
 	defer s.Close()
 
 	u, err := s.Me()
 	if err != nil {
-		p.Send(logMsg{Msg: "Unable to get user", Type: Error})
+		tui.Send(logMsg{Msg: "Unable to get user", Type: Error})
 	}
 
-	p.Send(logMsg{Msg: "Logged in as " + u.Username, Type: Info})
+	tui.Send(logMsg{Msg: "Logged in as " + u.Username, Type: Info})
 	CurrentUserID = u.ID.String()
 	select {}
 }
@@ -48,7 +48,7 @@ func AskClyde(msg string) {
 	if clydeChannel == 0 {
 		id, err := discord.ParseSnowflake(os.Getenv("CLYDE_CHANNEL_ID"))
 		if err != nil {
-			p.Send(logMsg{Msg: "Unable to parse channel id", Type: Error})
+			tui.Send(logMsg{Msg: "Unable to parse channel id", Type: Error})
 		}
 		clydeChannel = discord.ChannelID(id)
 	}
