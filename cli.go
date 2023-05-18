@@ -16,11 +16,11 @@ func RunCLI(prompt string) {
 	s.Start()
 
 	<-Ready
-	go AskClyde(prompt, "Answer the question while being as specific and short as possible. DO NOT add extra details")
+	go AskClyde(prompt, "Answer the question while being as specific and short as possible. DO NOT add extra details. Use Markdown when needed")
 
 	resp := <-CLIChan
-	parsed, _ := FormatClydeReponse(resp)
+	_, formatted := FormatClydeReponse(resp)
 
 	s.Stop()
-	fmt.Printf("%s\n", parsed)
+	fmt.Print(formatted)
 }
