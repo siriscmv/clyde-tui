@@ -3,9 +3,19 @@ package main
 import (
 	"log"
 	"os"
+	"strings"
 
 	godotenv "github.com/joho/godotenv"
 )
+
+type Mode string
+
+const (
+	CLI Mode = "CLI"
+	TUI Mode = "TUI"
+)
+
+var mode Mode
 
 func main() {
 	godotenv.Load(".env")
@@ -13,13 +23,20 @@ func main() {
 
 	if token == "" {
 		log.Fatalln("No $CLYDE_DISCORD_USER_TOKEN given.")
-		os.Exit(1)
 	} else if os.Getenv("CLYDE_CHANNEL_ID") == "" {
 		log.Fatalln("No $CLYDE_CHANNEL_ID given.")
-		os.Exit(1)
 	}
 
 	go InitClipboard()
 	go RunDiscordSession(token)
-	RunTUI()
+
+	args := os.Args[1:]
+
+	if len(args) > 0 {
+		mode = CLI
+		RunCLI(strings.Join(args, " "))
+	} else {
+		mode = TUI
+		RunTUI()
+	}
 }

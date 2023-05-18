@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"log"
 
 	"github.com/diamondburned/arikawa/v3/discord"
 	"github.com/diamondburned/arikawa/v3/gateway"
@@ -13,31 +14,53 @@ type DiscordMessage *gateway.MessageCreateEvent
 const clydeID = 1081004946872352958
 
 var (
-	s             *session.Session
-	clydeChannel  discord.ChannelID
+	Session       *session.Session
+	ClydeChannel  discord.ChannelID
 	CurrentUserID string
 )
 
+var Ready chan bool = make(chan bool)
+
 func RunDiscordSession(token string) {
-	s = session.New(token)
-	s.AddHandler(func(c *gateway.MessageCreateEvent) {
-		if c.Author.ID != clydeID || c.ChannelID != clydeChannel {
+	Session = session.New(token)
+	Session.AddHandler(func(c *gateway.MessageCreateEvent) {
+		if c.Author.ID != clydeID || c.ChannelID != ClydeChannel {
 			return
 		}
-		tui.Send(DiscordMessage(c))
+
+		if mode == TUI {
+			tui.Send(DiscordMessage(c))
+		} else if mode == CLI {
+			CLIChan <- c.Content
+		}
+
 	})
 
-	if err := s.Open(context.Background()); err != nil {
-		tui.Send(logMsg{Msg: "Unable to establish discord connection", Type: Error})
+	if err := Session.Open(context.Background()); err != nil {
+		if mode == TUI {
+			tui.Send(logMsg{Msg: "Unable to establish discord connection", Type: Error})
+		} else if mode == CLI {
+			log.Fatalln("Unable to establist discord connection")
+		}
 	}
-	defer s.Close()
+	defer Session.Close()
 
-	u, err := s.Me()
+	u, err := Session.Me()
 	if err != nil {
-		tui.Send(logMsg{Msg: "Unable to get user", Type: Error})
+		if mode == TUI {
+			tui.Send(logMsg{Msg: "Unable to get user", Type: Error})
+		} else if mode == CLI {
+			log.Fatalln("Unable to get user")
+		}
 	}
 
-	tui.Send(logMsg{Msg: "Logged in as " + u.Username, Type: Info})
 	CurrentUserID = u.ID.String()
+
+	if mode == TUI {
+		tui.Send(logMsg{Msg: "Logged in as " + u.Username, Type: Info})
+	} else if mode == CLI {
+		Ready <- true
+	}
+
 	select {}
 }

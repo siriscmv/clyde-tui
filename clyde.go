@@ -10,12 +10,12 @@ import (
 )
 
 func AskClyde(prompt string, instructions string) {
-	if clydeChannel == 0 {
+	if ClydeChannel == 0 {
 		id, err := discord.ParseSnowflake(os.Getenv("CLYDE_CHANNEL_ID"))
 		if err != nil {
 			tui.Send(logMsg{Msg: "Unable to parse channel id", Type: Error})
 		}
-		clydeChannel = discord.ChannelID(id)
+		ClydeChannel = discord.ChannelID(id)
 	}
 
 	if strings.Contains(prompt, "@cb") {
@@ -26,7 +26,7 @@ func AskClyde(prompt string, instructions string) {
 		prompt += ".\n" + instructions
 	}
 
-	s.SendMessage(clydeChannel, prompt)
+	Session.SendMessage(ClydeChannel, prompt)
 }
 
 func FormatClydeReponse(msg string) (string, string) {
