@@ -2,7 +2,6 @@ package main
 
 import (
 	"fmt"
-	"os"
 	"strings"
 
 	"github.com/charmbracelet/bubbles/key"
@@ -10,7 +9,6 @@ import (
 	"github.com/charmbracelet/bubbles/textarea"
 	"github.com/charmbracelet/bubbles/viewport"
 	tea "github.com/charmbracelet/bubbletea"
-	"github.com/charmbracelet/glamour"
 	"github.com/charmbracelet/lipgloss"
 )
 
@@ -157,7 +155,7 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			return m, tea.Quit
 		case tea.KeyEnter:
 			prompt := m.textarea.Value()
-			go AskClyde(prompt)
+			go AskClyde(prompt, "")
 
 			m.waiting = true
 			m.messages = append(m.messages, UserStyle.Render(prompt))
@@ -165,7 +163,7 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			m.textarea.Reset()
 			m.viewport.GotoBottom()
 
-			return m, tea.Batch(tiCmd, vpCmd, spinner.Tick)
+			return m, tea.Batch(tiCmd, vpCmd, m.spinner.Tick)
 		}
 
 	case errMsg:
@@ -173,19 +171,11 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		return m, nil
 
 	case DiscordMessage:
-		parsed := strings.ReplaceAll(msg.Content, fmt.Sprintf("<@!%s>", CurrentUserID), "`@You`")
-		var md string
-
+		parsed, response := FormatClydeReponse(msg.Content)
 		m.lastMsg = parsed
 
-		if os.Getenv("GLAMOUR_STYLE") != "" {
-			md, _ = glamour.RenderWithEnvironmentConfig(parsed)
-		} else {
-			md, _ = glamour.Render(parsed, "dark")
-		}
-
 		m.waiting = false
-		m.messages = append(m.messages, strings.Trim(md, "\n")+"\n")
+		m.messages = append(m.messages, response)
 		m.viewport.SetContent(strings.Join(m.messages, "\n"))
 		m.viewport.GotoBottom()
 
