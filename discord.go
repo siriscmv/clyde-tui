@@ -40,7 +40,7 @@ func RunDiscordSession(token string) {
 		if mode == TUI {
 			tui.Send(logMsg{Msg: "Unable to establish discord connection", Type: Error})
 		} else if mode == CLI {
-			log.Fatalln("Unable to establist discord connection")
+			log.Fatalln("Unable to establish discord connection")
 		}
 	}
 	defer Session.Close()

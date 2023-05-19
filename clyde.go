@@ -29,7 +29,7 @@ func AskClyde(prompt string, instructions string) {
 	Session.SendMessage(ClydeChannel, prompt)
 }
 
-func FormatClydeReponse(msg string) (string, string) {
+func FormatClydeResponse(msg string) (string, string) {
 	parsed := strings.ReplaceAll(msg, fmt.Sprintf("<@!%s>", CurrentUserID), "`@You`")
 	var md string
 

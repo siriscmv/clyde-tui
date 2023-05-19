@@ -19,7 +19,7 @@ func RunCLI(prompt string) {
 	go AskClyde(prompt, "Answer the question while being as specific and short as possible. DO NOT add extra details. Use Markdown when needed")
 
 	resp := <-CLIChan
-	_, formatted := FormatClydeReponse(resp)
+	_, formatted := FormatClydeResponse(resp)
 
 	s.Stop()
 	fmt.Print(formatted)

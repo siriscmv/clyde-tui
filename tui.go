@@ -171,7 +171,7 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		return m, nil
 
 	case DiscordMessage:
-		parsed, response := FormatClydeReponse(msg.Content)
+		parsed, response := FormatClydeResponse(msg.Content)
 		m.lastMsg = parsed
 
 		m.waiting = false
