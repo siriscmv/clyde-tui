@@ -14,13 +14,6 @@
 
 ## Usage
 
-### Prebuilt binaries
-
-- Download the appropriate latest binary from [releases](https://github.com/siris01/clyde-tui/releases/)
-- Ensure the required ENV variables are present (see below)
-
-### From source
-
 - Create a new Discord user account and get its token
 - Create a private Discord server, enable Clyde, create a thread for Clyde and copy its ID
 - Create an .env file:
@@ -31,6 +24,15 @@ CLYDE_CHANNEL_ID="channel_id_here"
 GLAMOUR_STYLE="/path/to/glamour/style" # optional
 ```
 
+### Prebuilt binaries
+
+- Download the latest appropriate binary from [releases](https://github.com/siris01/clyde-tui/releases/)
+- Ensure the required ENV variables are present
+- Run the binary
+
+### From source
+
+- Download the code
 - Run using `go run .`
 - Build using `go build .`
 
